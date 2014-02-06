@@ -366,9 +366,21 @@ Vec3D cross (const Vec3D& u, const Vec3D& v)
 }
 
 
+double min (const Vec3D& v)
+{
+    return std::min(v[0], std::min(v[1], v[2]));
+}
+
+
 double sum (const Vec3D& v)
 {
     return v[0] + v[1] + v[2];
+}
+
+
+double prod (const Vec3D& v)
+{
+    return v[0] * v[1] * v[2];
 }
 
 
@@ -387,6 +399,18 @@ double dot (const Vec3D& a, const Vec3D& b)
 double dist (const Vec3D& a, const Vec3D& b)
 {
     return norm(b - a);
+}
+
+
+Vec3D randomUnit()
+{
+    double theta = 1.0 * M_PI * std::rand() / RAND_MAX;
+    double phi   = 2.0 * M_PI * std::rand() / RAND_MAX;
+    return Vec3D(
+        std::sin(theta) * std::sin(phi),
+        std::sin(theta) * std::cos(phi),
+        std::cos(theta)
+        );
 }
 
 

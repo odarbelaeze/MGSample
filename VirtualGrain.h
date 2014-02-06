@@ -4,28 +4,33 @@
 #include "Vec3D.h"
 #include "Atom.h"
 
-#include <stack>
-#include <vector>
 #include <algorithm>
 #include <functional>
+#include <iostream>
+#include <vector>
 
 class VirtualGrain
 {
 public:
-    VirtualGrain(const Vec3D&, size_t);
+    VirtualGrain(const Vec3D&, int);
     ~VirtualGrain();
 
-    Atom pop();
+    Atom top() const;
+    Atom* pop();
+    bool isEmpty() const;
+    double currentDist() const;
     
     Vec3D getOrigin() const;
     Vec3D getA() const;
     Vec3D getB() const;
     Vec3D getC() const;
 
+    friend std::ostream& operator<< (std::ostream& os, const VirtualGrain& vg);
 
 private:
     int _id;
-    std::stack<Atom> _atoms;
+    std::vector<Atom> _atoms;
+    int _head;
 
     Vec3D _origin;
     Vec3D _a;
@@ -34,5 +39,6 @@ private:
 
     static int _gid;
 };
+
 
 #endif

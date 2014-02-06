@@ -43,12 +43,12 @@ Octree::~Octree()
 }
 
 
-unsigned int Octree::getOctant(const Vec3D& pos)const
+unsigned int Octree::getOctant(const Vec3D& pos) const
 {
-    unsigned int oct = 0;
-    if(pos[0] >= _origin[0]) oct |= 4U;
-    if(pos[1] >= _origin[1]) oct |= 2U;
-    if(pos[2] >= _origin[2]) oct |= 1U;
+    int oct = 0;
+    if(pos[0] >= _origin[0]) oct |= 4;
+    if(pos[1] >= _origin[1]) oct |= 2;
+    if(pos[2] >= _origin[2]) oct |= 1;
     return oct;
 }
 

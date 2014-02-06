@@ -1,8 +1,8 @@
-OBJECTS = Vec3D.o Octree.o Sample.o Atom.o main.o
+OBJECTS = Vec3D.o Octree.o Sample.o Atom.o VirtualGrain.o main.o
 FLAGS = -O2
 
 main: $(OBJECTS)
-	g++ -std=c++11 $(FLAGS) -o main main.o Vec3D.o
+	g++ -std=c++11 $(FLAGS) -o main $(OBJECTS)
 
 main.o: main.cc
 	g++ -std=c++11 $(FLAGS) -c $<
@@ -20,3 +20,5 @@ debug: main
 	@true
 .PHONY: debug
 
+clear:
+	rm *.o main

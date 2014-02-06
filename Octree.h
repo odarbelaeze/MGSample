@@ -1,16 +1,12 @@
 #ifndef OCTREE_H_
 #define OCTREE_H_
 
-#include <vector>
+#include "Atom.h"
 #include "Vec3D.h"
 
+#include <vector>
 
-struct Point
-{
-    Vec3D pos;
-    int grainId;
-};
-
+typedef Atom Point;
 
 class Octree
 {
@@ -21,7 +17,7 @@ public:
     Octree(Octree&&);
     ~Octree();
 
-    unsigned int getOctant(const Vec3D&)const;
+    unsigned int getOctant(const Vec3D&) const;
     bool isLeaf() const;
     void insert(Point* point);
     void getPointsInside(
