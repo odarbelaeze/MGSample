@@ -14,21 +14,12 @@ Sample::Sample(Vec3D halfdim, double meanRad)
             ) * 2.0 * _halfdim);
     }
 
-    int maxDist = 0;
-    for (int i = 0; i < _seeds.size(); ++i)
-    {
-        for (int j = i + 1; j < _seeds.size(); ++j)
-        {
-            int d = dist(_seeds[i], _seeds[j]);
-            maxDist =  maxDist > d ? maxDist : d;
-        }
-    }
-
-    maxDist = maxDist < min(_halfdim) ? maxDist : min(_halfdim);
+    int width = std::pow(4.0 * prod(_halfdim), (1.0 / 3.0));
+    width = std::max(width, 3 * (int) _meanRad);
 
     for (int i = 0; i < _seeds.size(); ++i)
     {
-        _virtualGrains.push_back(VirtualGrain(_seeds[i], maxDist));
+        _virtualGrains.push_back(VirtualGrain(_seeds[i], width));
     }
 
     _rads.resize(nSeeds);
@@ -109,6 +100,8 @@ void Sample::_addNext()
     std::vector<Atom*> atomsAround;
 
     _octree.getPointsInside(atom -> pos - 1.0, atom -> pos + 1.0, atomsAround);
+
+    if (atomsAround.empty()) return;
 
     int nSame = std::count_if(begin(atomsAround), end(atomsAround), 
         [&, atom](const Atom* other) { return atom -> gid == other -> gid; });
