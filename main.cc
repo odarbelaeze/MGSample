@@ -4,7 +4,8 @@
 
 int main(int argc, char const *argv[])
 {
-    Sample s(Vec3D(10.0, 10.0, 10.0), 5.0);
-    // std::cout << s << std::endl;
+    Sample s({10, 10, 50}, 10.0);
+    std::cout << s << std::endl;
+
     return 0;
 }

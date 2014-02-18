@@ -1,7 +1,9 @@
 #ifndef ATOM_H_
 #define ATOM_H_
 
-#include "Vec3D.h"
+#include <eigen3/Eigen/Dense>
+
+typedef Eigen::Vector3d Vec3D;
 
 struct Atom
 { 

@@ -15,7 +15,7 @@ Sample::Sample(Vec3D halfdim, double meanRad)
     }
 
     int width = std::pow(4.0 * prod(_halfdim), (1.0 / 3.0));
-    width = std::max(width, 3 * (int) _meanRad);
+    width = std::max(width, 2 * (int) _meanRad);
 
     for (int i = 0; i < _seeds.size(); ++i)
     {
@@ -78,10 +78,6 @@ void Sample::_addSpheres()
             Atom* atom = _virtualGrains[i].pop();
             _atoms.push_back(atom);
             _octree.insert(atom);
-            std::cout << atom -> pos[0] << " "
-                      << atom -> pos[1] << " "
-                      << atom -> pos[2] << " "
-                      << atom -> gid    << std::endl;
         }
     }
 }
@@ -118,10 +114,6 @@ void Sample::_addNext()
     {
         _atoms.push_back(atom);
         _octree.insert(atom);
-        std::cout << atom -> pos[0] << " "
-                  << atom -> pos[1] << " "
-                  << atom -> pos[2] << " "
-                  << atom -> gid    << std::endl;
     }
 
 }

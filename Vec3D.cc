@@ -1,113 +1,86 @@
 #include "Vec3D.h"
 
 Vec3D::Vec3D()
+ : _x{0.0}, _y{0.0}, _z{0.0}
 {
-    _data = new double[3];
-}
-
-
-Vec3D::Vec3D(const Vec3D& other)
- : _data(new double[3])
-{
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] = other._data[i];
-    }
-}
-
-
-Vec3D::Vec3D(Vec3D&& other)
- : _data(other._data)
-{
-    other._data = nullptr;
 }
 
 
 Vec3D::Vec3D(double x, double y, double z)
- : _data(new double[3])
+ : _x{x}, _y{y}, _z{z}
 {
-    _data[0] = x;
-    _data[1] = y;
-    _data[2] = z;
 }
 
 
 Vec3D::Vec3D(std::initializer_list<double> il)
 {
     if (il.size() != 3) throw ShapeException();
-    if (_data == nullptr) _data = new double[3];
     auto ilf = begin(il);
-    _data[0] = *(ilf + 0);
-    _data[1] = *(ilf + 1);
-    _data[2] = *(ilf + 2);
-}
-
-
-Vec3D::~Vec3D()
-{
-    _data = nullptr;
+    _x = *(ilf + 0);
+    _y = *(ilf + 1);
+    _z = *(ilf + 2);
 }
 
 
 double Vec3D::x() const
 {
-    return _data[0];
+    return _x;
 }
 
 
 double Vec3D::y() const
 {
-    return _data[1];
+    return _y;
 }
 
 
 double Vec3D::z() const
 {
-    return _data[2];
+    return _z;
 }
 
 
-double& Vec3D::operator[] (int i) const
+const double& Vec3D::operator[] (int i) const
 {
-    if (i < 0 || i > 2) throw OutOfBounds();
-    return _data[i];
-}
-
-
-Vec3D& Vec3D::operator= (const Vec3D& other)
-{
-    if (this != &other)
+    switch (i)
     {
-        if (_data == nullptr) _data = new double[3];
-        for (int i = 0; i < 3; ++i)
-        {
-            _data[i] = other._data[i];
-        }
+        case 0:
+            return _x;
+        case 1:
+            return _y;
+        case 2:
+            return _z;
+        default:
+            throw OutOfBounds();
+            break;
     }
-    return *this;
 }
 
 
-Vec3D& Vec3D::operator= (Vec3D&& other)
+double& Vec3D::operator[] (int i)
 {
-    if (this != &other)
+    switch (i)
     {
-        if (_data != nullptr) delete _data;
-        _data = other._data;
-        other._data = nullptr;
+        case 0:
+            return _x;
+        case 1:
+            return _y;
+        case 2:
+            return _z;
+        default:
+            throw OutOfBounds();
+            break;
     }
-    return *this;
 }
 
 
 Vec3D& Vec3D::operator= (std::initializer_list<double> il)
 {
     if (il.size() != 3) throw ShapeException();
-    if (_data == nullptr) _data = new double[3];
     auto ilf = begin(il);
-    _data[0] = *(ilf + 0);
-    _data[1] = *(ilf + 1);
-    _data[2] = *(ilf + 2);
+    _x = *(ilf + 0);
+    _y = *(ilf + 1);
+    _z = *(ilf + 2);
 }
 
 
@@ -119,96 +92,87 @@ Vec3D Vec3D::operator+ ()
 
 Vec3D Vec3D::operator- ()
 {
-    return Vec3D(- _data[0], - _data[1], - _data[2]);
+    return Vec3D(- _x, - _y, - _z);
 }
 
 
 Vec3D Vec3D::operator+= (const Vec3D& other)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] += other._data[i];
-    }
+    _x += other._x;
+    _y += other._y;
+    _z += other._z;
     return *this;
 }
 
 
 Vec3D Vec3D::operator-= (const Vec3D& other)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] -= other._data[i];
-    }
+    _x -= other._x;
+    _y -= other._y;
+    _z -= other._z;
     return *this;
 }
 
 
 Vec3D Vec3D::operator*= (const Vec3D& other)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] *= other._data[i];
-    }
+    _x *= other._x;
+    _y *= other._y;
+    _z *= other._z;
     return *this;
 }
 
 
 Vec3D Vec3D::operator/= (const Vec3D& other)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] /= other._data[i];
-    }
+    _x /= other._x;
+    _y /= other._y;
+    _z /= other._z;
     return *this;
 }
 
 
 Vec3D Vec3D::operator+= (const double& c)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] += c;
-    }
+    _x += c;
+    _y += c;
+    _z += c;
     return *this;
 }
 
 
 Vec3D Vec3D::operator-= (const double& c)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] -= c;
-    }
+    _x -= c;
+    _y -= c;
+    _z -= c;
     return *this;
 }
 
 
 Vec3D Vec3D::operator*= (const double& c)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] *= c;
-    }
+    _x *= c;
+    _y *= c;
+    _z *= c;
     return *this;
 }
 
 
 Vec3D Vec3D::operator/= (const double& c)
 {
-    for (int i = 0; i < 3; ++i)
-    {
-        _data[i] /= c;
-    }
+    _x /= c;
+    _y /= c;
+    _z /= c;
     return *this;
 }
 
 Vec3D operator+ (const Vec3D& a, const Vec3D& b)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = a[i] + b[i];
-    }
+    ans[0] = a[0] + b[0];
+    ans[1] = a[1] + b[1];
+    ans[2] = a[2] + b[2];
     return ans;
 }
 
@@ -216,10 +180,9 @@ Vec3D operator+ (const Vec3D& a, const Vec3D& b)
 Vec3D operator- (const Vec3D& a, const Vec3D& b)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = a[i] - b[i];
-    }
+    ans[0] = a[0] - b[0];
+    ans[1] = a[1] - b[1];
+    ans[2] = a[2] - b[2];
     return ans;
 }
 
@@ -227,10 +190,9 @@ Vec3D operator- (const Vec3D& a, const Vec3D& b)
 Vec3D operator* (const Vec3D& a, const Vec3D& b)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = a[i] * b[i];
-    }
+    ans[0] = a[0] * b[0];
+    ans[1] = a[1] * b[1];
+    ans[2] = a[2] * b[2];
     return ans;
 }
 
@@ -238,10 +200,9 @@ Vec3D operator* (const Vec3D& a, const Vec3D& b)
 Vec3D operator/ (const Vec3D& a, const Vec3D& b)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = a[i] / b[i];
-    }
+    ans[0] = a[0] / b[0];
+    ans[1] = a[1] / b[1];
+    ans[2] = a[2] / b[2];
     return ans;
 }
 
@@ -249,10 +210,9 @@ Vec3D operator/ (const Vec3D& a, const Vec3D& b)
 Vec3D operator+ (const Vec3D& v, const double& c)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = v[i] + c;
-    }
+    ans[0] = v[0] + c;
+    ans[1] = v[1] + c;
+    ans[2] = v[2] + c;
     return ans;
 }
 
@@ -260,10 +220,9 @@ Vec3D operator+ (const Vec3D& v, const double& c)
 Vec3D operator- (const Vec3D& v, const double& c)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = v[i] - c;
-    }
+    ans[0] = v[0] - c;
+    ans[1] = v[1] - c;
+    ans[2] = v[2] - c;
     return ans;
 }
 
@@ -271,10 +230,9 @@ Vec3D operator- (const Vec3D& v, const double& c)
 Vec3D operator* (const Vec3D& v, const double& c)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = v[i] * c;
-    }
+    ans[0] = v[0] * c;
+    ans[1] = v[1] * c;
+    ans[2] = v[2] * c;
     return ans;
 }
 
@@ -282,10 +240,9 @@ Vec3D operator* (const Vec3D& v, const double& c)
 Vec3D operator/ (const Vec3D& v, const double& c)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = v[i] / c;
-    }
+    ans[0] = v[0] / c;
+    ans[1] = v[1] / c;
+    ans[2] = v[2] / c;
     return ans;
 }
 
@@ -293,10 +250,9 @@ Vec3D operator/ (const Vec3D& v, const double& c)
 Vec3D operator+ (const double& c, const Vec3D& v)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = c + v[i];
-    }
+    ans[0] =  c + v[0];
+    ans[1] =  c + v[1];
+    ans[2] =  c + v[2];
     return ans;
 }
 
@@ -304,10 +260,9 @@ Vec3D operator+ (const double& c, const Vec3D& v)
 Vec3D operator- (const double& c, const Vec3D& v)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = c - v[i];
-    }
+    ans[0] =  c - v[0];
+    ans[1] =  c - v[1];
+    ans[2] =  c - v[2];
     return ans;
 }
 
@@ -315,10 +270,9 @@ Vec3D operator- (const double& c, const Vec3D& v)
 Vec3D operator* (const double& c, const Vec3D& v)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = c * v[i];
-    }
+    ans[0] =  c * v[0];
+    ans[1] =  c * v[1];
+    ans[2] =  c * v[2];
     return ans;
 }
 
@@ -326,10 +280,9 @@ Vec3D operator* (const double& c, const Vec3D& v)
 Vec3D operator/ (const double& c, const Vec3D& v)
 {
     Vec3D ans;
-    for (int i = 0; i < 3; ++i)
-    {
-        ans[i] = c / v[i];
-    }
+    ans[0] =  c / v[0];
+    ans[1] =  c / v[1];
+    ans[2] =  c / v[2];
     return ans;
 }
 

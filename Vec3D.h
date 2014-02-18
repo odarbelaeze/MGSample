@@ -13,20 +13,16 @@ class Vec3D
 {
 public:
     Vec3D();
-    Vec3D(const Vec3D&);
-    Vec3D(Vec3D&&);
     Vec3D(double, double, double);
     Vec3D(std::initializer_list<double>);
-    ~Vec3D();
 
     double x() const;
     double y() const;
     double z() const;
 
-    double& operator[] (int) const;
+    const double& operator[] (int) const;
+    double& operator[] (int);
 
-    Vec3D& operator= (const Vec3D&);
-    Vec3D& operator= (Vec3D&&);
     Vec3D& operator= (std::initializer_list<double>);
 
     Vec3D operator+ ();
@@ -43,7 +39,9 @@ public:
     Vec3D operator/= (const double&);
 
 private:
-    double* _data;
+    double _x;
+    double _y;
+    double _z;
 
 };
 
