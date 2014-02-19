@@ -4,6 +4,7 @@
 #include "Atom.h"
 
 #include <cmath>
+#include <stdexcept>
 #include <vector>
 
 #include <eigen3/Eigen/Dense>
