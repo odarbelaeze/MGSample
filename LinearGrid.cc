@@ -43,7 +43,7 @@ void LinearGrid::insert(Point* point)
 
 int LinearGrid::getCell (const Vec3D& pos) const
 {
-    Vec3D dims = pos.array() / _cell.array();
+    Vec3D dims = ((pos - _origin) + _halfwidth).array() / _cell.array();
     return (int) dims(0) + (int) dims(1) * _w + (int) dims(2) * _w * _l;
 }
 

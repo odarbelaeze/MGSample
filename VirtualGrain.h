@@ -1,43 +1,32 @@
 #ifndef VIRTUAL_GRAIN_H_
 #define VIRTUAL_GRAIN_H_
 
-#include "Vec3D.h"
+#include <algorithm>
+#include <cmath>
+#include <functional>
+#include <vector>
+
+#include <eigen3/Eigen/Dense>
+
 #include "Atom.h"
 
-#include <algorithm>
-#include <functional>
-#include <iostream>
-#include <vector>
+typedef Eigen::Vector3d Vec3D;
 
 class VirtualGrain
 {
 public:
-    VirtualGrain(const Vec3D&, int);
-    ~VirtualGrain();
+    VirtualGrain(int, int);
+    VirtualGrain(const std::vector<Vec3D>&, int, int);
 
-    Atom top() const;
-    Atom* pop();
-    bool isEmpty() const;
-    double currentDist() const;
-    
-    Vec3D getOrigin() const;
-    Vec3D getA() const;
-    Vec3D getB() const;
-    Vec3D getC() const;
-
-    friend std::ostream& operator<< (std::ostream& os, const VirtualGrain& vg);
+    Vec3D top(int) const;
+    Vec3D pop(int);
+    bool isEmpty(int) const;
+    double currentDist(int) const;
 
 private:
-    int _id;
-    std::vector<Atom> _atoms;
-    int _head;
+    std::vector<Vec3D> _positions;
+    std::vector<int>   _heads;
 
-    Vec3D _origin;
-    Vec3D _a;
-    Vec3D _b;
-    Vec3D _c;
-
-    static int _gid;
 };
 
 

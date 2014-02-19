@@ -2,14 +2,16 @@
 #define SAMPLE_H_
 
 #include "Atom.h"
-#include "Octree.h"
-#include "Vec3D.h"
 #include "VirtualGrain.h"
 
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+
+#include <eigen3/Eigen/Dense>
+
+typedef Eigen::Vector3d Vec3D;
 
 class Sample
 {

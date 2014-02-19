@@ -1,11 +1,12 @@
 #ifndef LINEAR_GRID_H_
 #define LINEAR_GRID_H_
 
+#include "Atom.h"
+
 #include <cmath>
 #include <vector>
-#include <eigen3/Eigen/Dense>
 
-#include "Atom.h"
+#include <eigen3/Eigen/Dense>
 
 typedef Atom Point;
 typedef Eigen::Vector3d Vec3D;

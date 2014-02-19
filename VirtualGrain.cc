@@ -1,108 +1,88 @@
 #include "VirtualGrain.h"
 
-int VirtualGrain::_gid = 0;
 
-
-VirtualGrain::VirtualGrain(const Vec3D& origin, int size)
- : _id(_gid ++), _origin(origin)
+VirtualGrain::VirtualGrain (int halfwidth, int ngrains = 1)
+    :   _positions(std::pow(2 * halfwidth + 1, 3)),
+        _heads(ngrains, std::pow(2 * halfwidth + 1, 3))
 {
     std::vector<Vec3D> basis({ Vec3D(0.0, 0.0, 0.0) });
 
-    _a = randomUnit();
-    _b = randomUnit();
-    _c = cross(_a, _b);
-    _b = cross(_a, _c);
+    int id = 0;
 
-    _b = _b / norm(_b);
-    _c = _c / norm(_c);
-
-    for (int i = - size; i <= size; ++i)
+    for (int i = - halfwidth; i <= halfwidth; ++i)
     {
-        for (int j = - size; j <= size; ++j)
+        for (int j = - halfwidth; j <= halfwidth; ++j)
         {
-            for (int k = - size; k <= size; ++k)
+            for (int k = - halfwidth; k <= halfwidth; ++k)
             {
-                for (const Vec3D& pos : basis)
+                for (auto&& pos : basis)
                 {
-                    _atoms.push_back(Atom(_origin + i * _a + j * _b + k * _c, _id));
+                    _positions.at(id ++) = Vec3D(i, j, k) + pos;
                 }
             }
         }
     }
 
-    std::sort(begin(_atoms), end(_atoms), 
-        [&, this](const Atom& a, const Atom& b) {
-            return dist(_origin, a.pos) > dist(_origin, b.pos);
+    std::sort(begin(_positions), end(_positions), 
+        [&, this](const Vec3D& a, const Vec3D& b) {
+            return a.norm() > b.norm();
         }
     );
-
-    _head = _atoms.size();
-
 }
 
 
-VirtualGrain::~VirtualGrain()
-{}
-
-
-Atom* VirtualGrain::pop()
+VirtualGrain::VirtualGrain (
+    const std::vector<Vec3D>& basis,
+    int halfwidth,
+    int ngrains = 1
+)
+    :   _positions(std::pow(2 * halfwidth, 3) * basis.size()),
+        _heads(ngrains, std::pow(2 * halfwidth, 3) * basis.size())
 {
-    return & _atoms[-- _head];
-}
+    int id = 0;
 
-
-Atom VirtualGrain::top() const
-{
-    return _atoms[_head - 1];
-}
-
-
-bool VirtualGrain::isEmpty() const
-{
-    return _head == 1;
-}
-
-
-double VirtualGrain::currentDist() const
-{
-    return dist(top().pos, _origin);
-}
-
-
-
-Vec3D VirtualGrain::getOrigin() const
-{
-    return _origin;
-}
-
-
-Vec3D VirtualGrain::getA() const
-{
-    return _a;
-}
-
-
-Vec3D VirtualGrain::getB() const
-{
-    return _b;
-}
-
-
-Vec3D VirtualGrain::getC() const
-{
-    return _c;
-}
-
-
-std::ostream& operator<< (std::ostream& os, const VirtualGrain& vg)
-{
-    for (int i = 0; i < vg._head; ++i)
+    for (int i = - halfwidth; i <= halfwidth; ++i)
     {
-        os << vg._atoms[i].pos[0] << " " 
-           << vg._atoms[i].pos[1] << " "
-           << vg._atoms[i].pos[2] << " "
-           << vg._atoms[i].gid    << std::endl;
+        for (int j = - halfwidth; j <= halfwidth; ++j)
+        {
+            for (int k = - halfwidth; k <= halfwidth; ++k)
+            {
+                for (auto&& pos : basis)
+                {
+                    _positions.at(id ++) = Vec3D(i, j, k) + pos;
+                }
+            }
+        }
     }
-    return os;
+
+    std::sort(begin(_positions), end(_positions), 
+        [&, this](const Vec3D& a, const Vec3D& b) {
+            return a.norm() > b.norm();
+        }
+    );
+}
+
+
+Vec3D VirtualGrain::pop(int gid = 0)
+{
+    return _positions.at(-- _heads.at(gid));
+}
+
+
+Vec3D VirtualGrain::top(int gid = 0) const
+{
+    return _positions.at(_heads.at(gid) - 1);
+}
+
+
+bool VirtualGrain::isEmpty(int gid = 0) const
+{
+    return _heads.at(gid) == 0;
+}
+
+
+double VirtualGrain::currentDist(int gid = 0) const
+{
+    return _positions.at(_heads.at(gid)).norm();
 }
 

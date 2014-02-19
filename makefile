@@ -1,4 +1,4 @@
-OBJECTS = Vec3D.o Octree.o Sample.o Atom.o VirtualGrain.o main.o
+OBJECTS = Atom.o VirtualGrain.o main.o
 FLAGS = -O2
 
 main: $(OBJECTS)
