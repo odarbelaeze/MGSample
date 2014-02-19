@@ -1,4 +1,4 @@
-OBJECTS = Atom.o VirtualGrain.o main.o
+OBJECTS = Atom.o Seed.o VirtualGrain.o LinearGrid.o Sample.o main.o
 FLAGS = -O2
 
 main: $(OBJECTS)
@@ -22,3 +22,6 @@ debug: main
 
 clear:
 	rm *.o main
+
+data: main
+	./main > data

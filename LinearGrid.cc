@@ -119,12 +119,17 @@ void LinearGrid::findInSphere (
         {
             for (int k = k_min; k <= k_max; ++k)
             {
-                for (auto&& pointptr : _data.at(getCell(i, j, k)))
-                {
-                    if ((pointptr -> pos - center).norm() < radius)
+                try {
+                    for (auto&& pointptr : _data.at(getCell(i, j, k)))
                     {
-                        query.push_back(pointptr);
+                        if ((pointptr -> pos - center).norm() < radius)
+                        {
+                            query.push_back(pointptr);
+                        }
                     }
+                }
+                catch (std::out_of_range& e) {
+                    continue;
                 }
             }
         }

@@ -1,15 +1,12 @@
 #include <iostream>
 
-#include "VirtualGrain.h"
+#include "Sample.h"
 
 int main(int argc, char const *argv[])
 {
-    VirtualGrain vg(50, 10);
+    Sample s(Vec3D(20.0, 20.0, 5.0), 2.5);
 
-    while (!vg.isEmpty(0))
-    {
-        std::cout << vg.pop(0).norm() << std::endl;
-    }
+    std::cout << s << std::endl;
 
     return 0;
 }

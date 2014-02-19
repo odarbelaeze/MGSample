@@ -15,13 +15,16 @@ typedef Eigen::Vector3d Vec3D;
 class VirtualGrain
 {
 public:
-    VirtualGrain(int, int);
-    VirtualGrain(const std::vector<Vec3D>&, int, int);
+    VirtualGrain(const int&, const int&);
+    VirtualGrain(const std::vector<Vec3D>&, const int&, const int&);
 
     Vec3D top(int) const;
     Vec3D pop(int);
+
     bool isEmpty(int) const;
     double currentDist(int) const;
+
+    bool available() const;
 
 private:
     std::vector<Vec3D> _positions;

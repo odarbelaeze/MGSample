@@ -2,6 +2,8 @@
 #define SAMPLE_H_
 
 #include "Atom.h"
+#include "Seed.h"
+#include "LinearGrid.h"
 #include "VirtualGrain.h"
 
 #include <cmath>
@@ -16,8 +18,7 @@ typedef Eigen::Vector3d Vec3D;
 class Sample
 {
 public:
-    Sample(Vec3D, double);
-    ~Sample();
+    Sample(const Vec3D&, double);
 
     friend std::ostream& operator<< (std::ostream&, const Sample&);
 
@@ -25,17 +26,18 @@ private:
 
     void _addSpheres();
     void _addNext();
-    bool _atomsAvailable();
 
-    Vec3D _halfdim;
+    Vec3D  _halfdim;
     double _meanRad;
+    int    _nSeeds;
 
-    std::vector<Vec3D> _seeds;
+    VirtualGrain _virtualGrain;
+    
+    std::vector<Seed> _seeds;
     std::vector<double> _rads;
-    std::vector<VirtualGrain> _virtualGrains;
     std::vector<Atom*> _atoms;
 
-    Octree _octree;
+    LinearGrid _linearGrid;
 
 };
 

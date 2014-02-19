@@ -1,48 +1,42 @@
 #include "Sample.h"
 
-Sample::Sample(Vec3D halfdim, double meanRad)
- : _halfdim(halfdim), _meanRad(meanRad), _octree(Vec3D(0.0, 0.0, 0.0), halfdim)
+Sample::Sample(const Vec3D& halfdim, double meanRad)
+    :   _halfdim(halfdim),
+        _meanRad(meanRad),
+        _virtualGrain(0, 1),
+        _linearGrid(Vec3D::Zero(), halfdim, 1.0)
 {
-    int nSeeds = (6.0 * prod(_halfdim)) / (M_PI * std::pow(_meanRad, 3));
+    _nSeeds = (6.0 * _halfdim.prod()) / (M_PI * std::pow(_meanRad, 3));
 
-    for (int i = 0; i < nSeeds; ++i)
+    for (int i = 0; i < _nSeeds; ++i)
     {
-        _seeds.push_back(Vec3D(
-                0.5 - (double) std::rand() / RAND_MAX,
-                0.5 - (double) std::rand() / RAND_MAX,
-                0.5 - (double) std::rand() / RAND_MAX
-            ) * 2.0 * _halfdim);
+        _seeds.push_back(
+            Seed(Vec3D::Random().array() * (_halfdim.array() - 0.5 * meanRad))
+        );
     }
 
-    int width = std::pow(4.0 * prod(_halfdim), (1.0 / 3.0));
-    width = std::max(width, 2 * (int) _meanRad);
+    int width = std::min(0.5 * _halfdim.maxCoeff(), 3 * meanRad);
 
-    for (int i = 0; i < _seeds.size(); ++i)
-    {
-        _virtualGrains.push_back(VirtualGrain(_seeds[i], width));
-    }
+    _virtualGrain = VirtualGrain(width, _nSeeds);
 
-    _rads.resize(nSeeds);
+    _rads.resize(_nSeeds);
 
     _addSpheres();
-    while(_atomsAvailable())
+    
+    while(_virtualGrain.available())
     {
         _addNext();
     }
 }
 
 
-Sample::~Sample()
-{}
-
-
 std::ostream& operator<< (std::ostream& os, const Sample& s)
 {
     for (int i = 0; i < s._atoms.size(); ++i)
     {
-        os << s._atoms[i] -> pos[0] << " "
-           << s._atoms[i] -> pos[1] << " "
-           << s._atoms[i] -> pos[2] << " "
+        os << s._atoms[i] -> pos(0) << " "
+           << s._atoms[i] -> pos(1) << " "
+           << s._atoms[i] -> pos(2) << " "
            << s._atoms[i] -> gid    << std::endl;
     }
     return os;
@@ -60,8 +54,10 @@ void Sample::_addSpheres()
 
         for (int j = 0; j < _seeds.size(); ++j)
         {
-            if (dist(_seeds[i], _seeds[j]) - (_rads[i] + _rads[j]) < 1.0 &&
-                i != j)
+            if (((_seeds[j].origin, _seeds[j].origin).norm() - 
+                 (_rads[i] + _rads[j]) < 1.0                   )
+
+                && i != j)
             {
                 touched[i] = true;
                 touched[j] = true;
@@ -73,11 +69,20 @@ void Sample::_addSpheres()
 
     for (int i = 0; i < _seeds.size(); ++i)
     {
-        while(_virtualGrains[i].currentDist() < _rads[i])
+        while(_virtualGrain.currentDist(i) < _rads[i])
         {
-            Atom* atom = _virtualGrains[i].pop();
-            _atoms.push_back(atom);
-            _octree.insert(atom);
+            Atom* atom = new Atom(
+                _seeds[i].getRealPos(_virtualGrain.pop(i)),
+                _seeds[i].id 
+            );
+
+            if (((atom -> pos).array() < _halfdim.array()).minCoeff() &&
+                ((atom -> pos).array() > (- _halfdim.array())).minCoeff())
+            {
+                _atoms.push_back(atom);
+                _linearGrid.insert(atom);
+            }
+
         }
     }
 }
@@ -85,43 +90,47 @@ void Sample::_addSpheres()
 
 void Sample::_addNext()
 {
-    int i = std::rand() % _virtualGrains.size();
+    int i = std::rand() % _seeds.size();
 
-    while (_virtualGrains[i].isEmpty())
+    while (_virtualGrain.isEmpty(i))
     {
-        i = std::rand() % _virtualGrains.size();
+        i = std::rand() % _seeds.size();
     }
 
-    Atom* atom = _virtualGrains[i].pop();
+    Atom* atom = new Atom(
+        _seeds[i].getRealPos(_virtualGrain.pop(i)),
+        _seeds[i].id 
+    );
+
     std::vector<Atom*> atomsAround;
 
-    _octree.getPointsInside(atom -> pos - 1.0, atom -> pos + 1.0, atomsAround);
+    _linearGrid.findInSphere(atom -> pos, 1.1, atomsAround);
 
     if (atomsAround.empty()) return;
 
     int nSame = std::count_if(begin(atomsAround), end(atomsAround), 
-        [&, atom](const Atom* other) { return atom -> gid == other -> gid; });
+        [&, atom](const Atom* other) { 
+            return atom -> gid == other -> gid;
+        });
 
     int nOther = atomsAround.size() - nSame;
 
     if (std::any_of(begin(atomsAround), end(atomsAround), 
-        [&, atom](const Atom* other){ return dist(atom -> pos, other -> pos) < 0.5; }))
+        [&, atom](const Atom* other){ 
+            return (other -> pos - atom -> pos).norm() < 0.5; }))
     {
         return;
     }
 
     if ( (nSame != 0) && (nSame > nOther) )
     {
-        _atoms.push_back(atom);
-        _octree.insert(atom);
+        if (((atom -> pos).array() < _halfdim.array()).minCoeff() &&
+            ((atom -> pos).array() > (- _halfdim.array())).minCoeff())
+        {
+            _atoms.push_back(atom);
+            _linearGrid.insert(atom);
+        }
     }
 
-}
-
-
-bool Sample::_atomsAvailable()
-{
-    return std::any_of(begin(_virtualGrains), end(_virtualGrains),
-                       [](const VirtualGrain& vg) { return !vg.isEmpty();} );
 }
 

@@ -1,7 +1,7 @@
 #include "VirtualGrain.h"
 
 
-VirtualGrain::VirtualGrain (int halfwidth, int ngrains = 1)
+VirtualGrain::VirtualGrain (const int& halfwidth, const int& ngrains = 1)
     :   _positions(std::pow(2 * halfwidth + 1, 3)),
         _heads(ngrains, std::pow(2 * halfwidth + 1, 3))
 {
@@ -33,8 +33,8 @@ VirtualGrain::VirtualGrain (int halfwidth, int ngrains = 1)
 
 VirtualGrain::VirtualGrain (
     const std::vector<Vec3D>& basis,
-    int halfwidth,
-    int ngrains = 1
+    const int& halfwidth,
+    const int& ngrains = 1
 )
     :   _positions(std::pow(2 * halfwidth, 3) * basis.size()),
         _heads(ngrains, std::pow(2 * halfwidth, 3) * basis.size())
@@ -83,6 +83,12 @@ bool VirtualGrain::isEmpty(int gid = 0) const
 
 double VirtualGrain::currentDist(int gid = 0) const
 {
-    return _positions.at(_heads.at(gid)).norm();
+    return _positions.at(_heads.at(gid) - 1).norm();
+}
+
+
+bool VirtualGrain::available() const
+{
+    return std::any_of(begin(_heads), end(_heads), [](int head) { return head > 0; });
 }
 
