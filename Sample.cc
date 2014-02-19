@@ -15,7 +15,7 @@ Sample::Sample(const Vec3D& halfdim, double meanRad)
         );
     }
 
-    int width = std::min(0.5 * _halfdim.maxCoeff(), 3 * meanRad);
+    int width = std::pow(4.0 * _halfdim.prod(), 1.0 / 3.0);
 
     _virtualGrain = VirtualGrain(width, _nSeeds);
 

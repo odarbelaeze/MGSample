@@ -1,8 +1,9 @@
 OBJECTS = Atom.o Seed.o VirtualGrain.o LinearGrid.o Sample.o main.o
 FLAGS = -O2
+LDFLAGS = -lboost_program_options
 
 main: $(OBJECTS)
-	g++ -std=c++11 $(FLAGS) -o main $(OBJECTS)
+	g++ -std=c++11 $(FLAGS) -o main $(OBJECTS) $(LDFLAGS)
 
 main.o: main.cc
 	g++ -std=c++11 $(FLAGS) -c $<
