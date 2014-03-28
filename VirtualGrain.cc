@@ -1,77 +1,71 @@
 #include "VirtualGrain.h"
 
 
-VirtualGrain::VirtualGrain (const int& halfwidth, const int& ngrains = 1)
-    :   _positions(std::pow(2 * halfwidth + 1, 3)),
-        _heads(ngrains, std::pow(2 * halfwidth + 1, 3))
+VirtualGrain::VirtualGrain (const int& halfwidth, const int& nGrains = 1)
+    :   _positions(nGrains)
 {
-    std::vector<Vec3D> basis({ Vec3D(0.0, 0.0, 0.0) });
+    _width = 4 * halfwidth + 1;
 
-    int id = 0;
+    auto maxSize = 4 * halfwidth * halfwidth * halfwidth;
 
-    for (int i = - halfwidth; i <= halfwidth; ++i)
+    _heads = std::vector<long> (nGrains, maxSize);
+
+    for (auto&& grain : _positions)
     {
-        for (int j = - halfwidth; j <= halfwidth; ++j)
+        std::vector<long> surface;
+
+        while (grain.size() < maxSize)
         {
-            for (int k = - halfwidth; k <= halfwidth; ++k)
+            if (grain.empty())
             {
-                for (auto&& pos : basis)
+                long c = (_width / 2) +
+                         (_width / 2) * _width +
+                         (_width / 2) * _width * _width;
+                surface = _findNbs(c);
+                grain.push_back(c);
+            }
+            else
+            {
+                long id = std::rand() % surface.size();
+                long c = surface[id];
+                
+                grain.push_back(c);
+                
+                surface.erase(
+                    std::remove(begin(surface), end(surface), c),
+                    end(surface)
+                );
+
+                for (auto&& i : _findNbs(c))
                 {
-                    _positions.at(id ++) = Vec3D(i, j, k) + pos;
+                    if (find(begin(grain), end(grain), i) == end(grain))
+                    {
+                        surface.push_back(i);
+                    }
                 }
             }
         }
     }
-
-    std::sort(begin(_positions), end(_positions), 
-        [&, this](const Vec3D& a, const Vec3D& b) {
-            return a.norm() > b.norm();
-        }
-    );
-}
-
-
-VirtualGrain::VirtualGrain (
-    const std::vector<Vec3D>& basis,
-    const int& halfwidth,
-    const int& ngrains = 1
-)
-    :   _positions(std::pow(2 * halfwidth, 3) * basis.size()),
-        _heads(ngrains, std::pow(2 * halfwidth, 3) * basis.size())
-{
-    int id = 0;
-
-    for (int i = - halfwidth; i <= halfwidth; ++i)
-    {
-        for (int j = - halfwidth; j <= halfwidth; ++j)
-        {
-            for (int k = - halfwidth; k <= halfwidth; ++k)
-            {
-                for (auto&& pos : basis)
-                {
-                    _positions.at(id ++) = Vec3D(i, j, k) + pos;
-                }
-            }
-        }
-    }
-
-    std::sort(begin(_positions), end(_positions), 
-        [&, this](const Vec3D& a, const Vec3D& b) {
-            return a.norm() > b.norm();
-        }
-    );
 }
 
 
 Vec3D VirtualGrain::pop(int gid = 0)
 {
-    return _positions.at(-- _heads.at(gid));
+    long c = _positions.at(gid).at(-- _heads.at(gid));
+    return Vec3D((c % _width) - _width / 2,
+                 (c / _width) % _width - _width / 2,
+                 (c / _width) / _width - _width / 2)
+    ;
 }
 
 
 Vec3D VirtualGrain::top(int gid = 0) const
 {
-    return _positions.at(_heads.at(gid) - 1);
+    long c = _positions.at(gid).at(_heads.at(gid) - 1);
+    return Vec3D((c % _width) - _width / 2,
+                 (c / _width) % _width - _width / 2,
+                 (c / _width) / _width - _width / 2)
+    ;
 }
 
 
@@ -83,7 +77,7 @@ bool VirtualGrain::isEmpty(int gid = 0) const
 
 double VirtualGrain::currentDist(int gid = 0) const
 {
-    return _positions.at(_heads.at(gid) - 1).norm();
+    return top(gid).norm();
 }
 
 
@@ -92,3 +86,15 @@ bool VirtualGrain::available() const
     return std::any_of(begin(_heads), end(_heads), [](int head) { return head > 0; });
 }
 
+
+std::vector<long> VirtualGrain::_findNbs(long c)
+{
+    std::vector<long> nbs;
+    nbs.push_back(c + 1);                   // North
+    nbs.push_back(c - 1);                   // South
+    nbs.push_back(c + _width);              // East
+    nbs.push_back(c - _width);              // West
+    nbs.push_back(c + _width * _width);     // Above
+    nbs.push_back(c - _width * _width);     // Under
+    return nbs;
+}

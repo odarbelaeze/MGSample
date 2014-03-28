@@ -2,13 +2,10 @@
 #define VIRTUAL_GRAIN_H_
 
 #include <algorithm>
-#include <cmath>
-#include <functional>
+#include <cstdlib>
 #include <vector>
 
 #include <eigen3/Eigen/Dense>
-
-#include "Atom.h"
 
 typedef Eigen::Vector3d Vec3D;
 
@@ -16,7 +13,6 @@ class VirtualGrain
 {
 public:
     VirtualGrain(const int&, const int&);
-    VirtualGrain(const std::vector<Vec3D>&, const int&, const int&);
 
     Vec3D top(int) const;
     Vec3D pop(int);
@@ -27,8 +23,11 @@ public:
     bool available() const;
 
 private:
-    std::vector<Vec3D> _positions;
-    std::vector<int>   _heads;
+    std::vector<std::vector<long> > _positions;
+    std::vector<long>   _heads;
+    long _width;
+
+    std::vector<long> _findNbs(long c);
 
 };
 
